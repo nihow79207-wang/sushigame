@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英文拼字壽司蒐集大賽</title>
+    <style>
+        :root { --sushi-red: #e63946; --ui-width: 92%; --wood: #f1dbaf; }
+        body { font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; background-color: #fdf0d5; text-align: center; margin: 0; padding: 10px; }
+        .container { max-width: 550px; margin: 10px auto; background: white; padding: 25px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 8px solid #333; position: relative; min-height: 850px; box-sizing: border-box; }
+        
+        .shop-header { background: var(--sushi-red); color: white; padding: 15px; border-radius: 15px 15px 0 0; margin: -25px -25px 25px -25px; font-weight: bold; font-size: 24px; border-bottom: 5px solid #bd2f3a; }
+
+        /* 遊戲說明區 */
+        .intro-box { background: #fffcf0; border: 2px dashed #e67e22; padding: 15px; border-radius: 15px; margin: 10px auto; text-align: left; line-height: 1.6; color: #5d4037; width: var(--ui-width); box-sizing: border-box; font-size: 14px; }
+
+        /* 蒐集底圖區域 */
+        #collection-board { width: var(--ui-width); position: relative; margin: 10px auto 20px; border-radius: 15px; overflow: hidden; border: 4px solid #333; line-height: 0; }
+        #collection-bg { width: 100%; height: auto; display: block; }
+        .reward-overlay { position: absolute; width: 22%; pointer-events: none; display: none; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3)); animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        /* 壽司位置微調 */
+        #pos-7 { top: 52%; left: 10%; }
+        #pos-8 { top: 48%; left: 45%; }
+        #pos-9 { top: 76%; left: 30%; }
+        #pos-10 { top: 65%; left: 63%; }
+
+        /* 單元單字預覽表 */
+        .unit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: var(--ui-width); margin: 0 auto 20px; }
+        .unit-card { background: #fff; border: 2px solid var(--wood); border-radius: 12px; padding: 10px; text-align: left; }
+        .unit-card h3 { margin: 0 0 5px 0; font-size: 16px; color: var(--sushi-red); border-bottom: 1px solid #eee; }
+        .word-preview { font-size: 11px; color: #777; line-height: 1.4; margin-bottom: 10px; height: 45px; overflow: hidden; }
+
+        /* 遊戲中元素 */
+        #image-container { width: var(--ui-width); aspect-ratio: 16 / 10; margin: 0 auto 15px; background: #fff; border-radius: 20px; border: 4px solid var(--wood); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        #image-container img { width: 100%; height: 100%; object-fit: contain; }
+        #answer-input { font-size: 26px; padding: 12px; width: var(--ui-width); border-radius: 15px; border: 3px solid #DDD; text-align: center; margin: 10px auto; display: block; outline: none; box-sizing: border-box; }
+        
+        .action-btn { width: var(--ui-width); padding: 15px; font-size: 18px; cursor: pointer; border-radius: 15px; border: none; font-weight: bold; margin: 8px auto; display: block; transition: 0.2s; }
+        .action-btn:active { transform: scale(0.98); }
+        .btn-speak { background: #3498db; color: white; }
+        .btn-submit { background: var(--sushi-red); color: white; box-shadow: 0 4px 0 #bd2f3a; }
+        .btn-start { background: #e67e22; color: white; padding: 8px; font-size: 14px; width: 100%; margin: 5px 0; }
+
+        /* 盤子堆疊 */
+        #plate-stack { position: absolute; left: 15px; bottom: 80px; display: flex; flex-direction: column-reverse; z-index: 10; pointer-events: none; }
+        .plate { width: 65px; height: 16px; background: #a8dadc; border: 2px solid #457b9d; border-radius: 50%; margin-bottom: -9px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); animation: slideIn 0.4s ease-out; }
+
+        /* 扭蛋區 */
+        #gacha-area { text-align: center; }
+        #gacha-video { 
+            width: var(--ui-width); 
+            max-width: 400px;
+            border-radius: 20px; 
+            margin-top: 30px;
+            background: #fff;
+            border: 4px solid var(--wood);
+        }
+        #reward-reveal { display: none; animation: pop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        #reward-reveal img { width: 220px; border: 8px solid gold; border-radius: 50%; background: white; margin-top: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+
+        .hidden { display: none; }
+        @keyframes slideIn { from { transform: translateX(-150px); } to { transform: translateX(0); } }
+        @keyframes pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="shop-header">🍣 壽司拼字蒐集賽</div>
+
+    <!-- 1. 主選單 -->
+    <div id="main-menu">
+        <div class="intro-box">
+            <b>歡迎來到壽司店！🍣</b><br>
+            拼對一個單字得一盤，集滿 <b>5 個盤子</b> 就能啟動扭蛋機！看看妳今天能蒐集到哪一隻壽司角色？加油！
+        </div>
+
+        <div id="collection-board">
+            <img id="collection-bg" src="collection_bg.png">
+            <img id="pos-7" class="reward-overlay" src="reward_7.png">
+            <img id="pos-8" class="reward-overlay" src="reward_8.png">
+            <img id="pos-9" class="reward-overlay" src="reward_9.png">
+            <img id="pos-10" class="reward-overlay" src="reward_10.png">
+        </div>
+
+        <div class="unit-grid">
+            <div class="unit-card">
+                <h3>Unit 7</h3>
+                <div class="word-preview" id="preview-7"></div>
+                <button class="action-btn btn-start" onclick="startGame(7)">挑戰此單元</button>
+            </div>
+            <div class="unit-card">
+                <h3>Unit 8</h3>
+                <div class="word-preview" id="preview-8"></div>
+                <button class="action-btn btn-start" onclick="startGame(8)">挑戰此單元</button>
+            </div>
+            <div class="unit-card">
+                <h3>Unit 9</h3>
+                <div class="word-preview" id="preview-9"></div>
+                <button class="action-btn btn-start" onclick="startGame(9)">挑戰此單元</button>
+            </div>
+            <div class="unit-card">
+                <h3>Unit 10</h3>
+                <div class="word-preview" id="preview-10"></div>
+                <button class="action-btn btn-start" onclick="startGame(10)">挑戰此單元</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 遊戲區域 -->
+    <div id="game-area" class="hidden">
+        <div id="plate-stack"></div>
+        <div id="image-container"></div>
+        <button class="action-btn btn-speak" onclick="speakWord()">🔊 聽聽發音</button>
+        <input type="text" id="answer-input" autocomplete="off" placeholder="在此輸入拼法..." onkeypress="handleKeyPress(event)">
+        <button class="action-btn btn-submit" onclick="checkAnswer()">放入回收口 ➔</button>
+        <div id="result-msg" style="height: 30px; margin-top: 10px; font-weight: bold; font-size: 18px;"></div>
+    </div>
+
+    <!-- 3. 扭蛋動畫區域 -->
+    <div id="gacha-area" class="hidden">
+        <div id="gacha-video-container">
+            <h2 style="color: var(--sushi-red);">びっくらポン！</h2>
+            <video id="gacha-video" muted playsinline>
+                <source src="gacha_shake.mp4" type="video/mp4">
+            </video>
+            <p style="color: #888;">正在扭蛋中...</p>
+        </div>
+        <div id="reward-reveal">
+            <h3>🎉 獲得新壽司了！</h3>
+            <img id="reward-img" src="">
+            <p id="reward-name" style="font-weight:bold; font-size:24px; color:#d4a017;"></p>
+            <button class="action-btn" onclick="backToMenu()" style="background:#2a9d8f; width:80%;">放回蒐集板</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const data = {
+        7: [{w: "recorder", i: "recorder.png"}, {w: "bike", i: "bike.png"}, {w: "umbrella", i: "umbrella.png"}, {w: "video game", i: "video game.png"}, {w: "watch", i: "watch.png"}, {w: "cell phone", i: "cell phone.png"}],
+        8: [{w: "get up", i: "get up.png"}, {w: "go to school", i: "go to school.png"}, {w: "come home", i: "come home.png"}, {w: "do homework", i: "do homework.png"}, {w: "go to bed", i: "go to bed.png"}],
+        9: [{w: "tell stories", i: "tell stories.png"}, {w: "study", i: "study.png"}, {w: "watch TV", i: "watch TV.png"}, {w: "work", i: "work.png"}, {w: "go to English class", i: "go to English class.png"}, {w: "practice kung fu", i: "practice kung fu.png"}],
+        10: [{w: "make breakfast", i: "make breakfast.png"}, {w: "eat lunch", i: "eat lunch.png"}, {w: "have snack", i: "have snack.png"}, {w: "eat dinner", i: "eat dinner.png"}]
+    };
+
+    const sushiNames = { 7: "鮮蝦壽司", 8: "鮭魚卵壽司", 9: "鮪魚壽司", 10: "太卷壽司" };
+    let currentUnitID = 0, currentPool = [], plateCount = 0, currentQuestion = null;
+
+    function initPreviews() {
+        for (let unit in data) {
+            document.getElementById(`preview-${unit}`).innerText = data[unit].map(d => d.w).join(', ');
+        }
+    }
+    initPreviews();
+
+    function startGame(unit) {
+        currentUnitID = unit; currentPool = [...data[unit]]; plateCount = 0;
+        document.getElementById('plate-stack').innerHTML = "";
+        document.getElementById('main-menu').classList.add('hidden');
+        document.getElementById('game-area').classList.remove('hidden');
+        nextQuestion();
+    }
+
+    function nextQuestion() {
+        if (currentPool.length === 0) currentPool = [...data[currentUnitID]];
+        const idx = Math.floor(Math.random() * currentPool.length);
+        currentQuestion = currentPool.splice(idx, 1)[0];
+        document.getElementById('image-container').innerHTML = `<img src="${currentQuestion.i}" onerror="this.src='https://dummyimage.com/300x200/eee/666&text=Sushi';">`;
+        document.getElementById('answer-input').value = ""; document.getElementById('answer-input').focus();
+    }
+
+    function speakWord() {
+        const msg = new SpeechSynthesisUtterance(currentQuestion.w);
+        msg.lang = 'en-US'; msg.rate = 0.7;
+        window.speechSynthesis.speak(msg);
+    }
+
+    function handleKeyPress(e) { if (e.key === 'Enter') checkAnswer(); }
+
+    function checkAnswer() {
+        const userAns = document.getElementById('answer-input').value.trim().toLowerCase();
+        const correctAns = currentQuestion.w.toLowerCase().replace(/[.!]/g, "").trim();
+
+        if (userAns === correctAns) {
+            plateCount++;
+            const p = document.createElement('div'); p.className = 'plate';
+            document.getElementById('plate-stack').appendChild(p);
+            if (plateCount >= 5) setTimeout(triggerGacha, 800);
+            else {
+                document.getElementById('result-msg').innerHTML = "<span style='color:green'>✨ 對了！盤子+1</span>";
+                setTimeout(nextQuestion, 1200);
+            }
+        } else {
+            document.getElementById('result-msg').innerHTML = "<span style='color:red'>拼錯囉，再試一次！💪</span>";
+        }
+    }
+
+    function triggerGacha() {
+        document.getElementById('game-area').classList.add('hidden');
+        document.getElementById('gacha-area').classList.remove('hidden');
+        document.getElementById('gacha-video-container').style.display = 'block';
+        document.getElementById('reward-reveal').style.display = 'none';
+
+        const video = document.getElementById('gacha-video');
+        video.currentTime = 0; 
+        
+        // 關鍵調整：使用 ended 事件監聽
+        video.onended = function() {
+            showReward();
+        };
+
+        // 播放影片
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(error => {
+                // 如果自動播放失敗（某些瀏覽器限制），3秒後強制顯示結果
+                console.log("播放被攔截，改用計時器");
+                setTimeout(showReward, 3000);
+            });
+        }
+    }
+
+    function showReward() {
+        document.getElementById('gacha-video-container').style.display = 'none';
+        document.getElementById('reward-reveal').style.display = 'block';
+        document.getElementById('reward-img').src = `reward_${currentUnitID}.png`;
+        document.getElementById('reward-name').innerText = sushiNames[currentUnitID];
+        document.getElementById(`pos-${currentUnitID}`).style.display = 'block';
+    }
+
+    function backToMenu() {
+        document.getElementById('gacha-area').classList.add('hidden');
+        document.getElementById('main-menu').classList.remove('hidden');
+    }
+</script>
+</body>
+</html>
+
