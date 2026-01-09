@@ -7,57 +7,30 @@
     <style>
         :root { --sushi-red: #e63946; --ui-width: 92%; --wood: #f1dbaf; }
         body { font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; background-color: #fdf0d5; text-align: center; margin: 0; padding: 10px; }
-        .container { max-width: 550px; margin: 10px auto; background: white; padding: 25px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 8px solid #333; position: relative; min-height: 850px; box-sizing: border-box; }
+        .container { max-width: 550px; margin: 10px auto; background: white; padding: 25px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 8px solid #333; position: relative; min-height: 800px; box-sizing: border-box; }
         
         .shop-header { background: var(--sushi-red); color: white; padding: 15px; border-radius: 15px 15px 0 0; margin: -25px -25px 25px -25px; font-weight: bold; font-size: 24px; border-bottom: 5px solid #bd2f3a; }
 
-        /* 遊戲說明區 */
         .intro-box { background: #fffcf0; border: 2px dashed #e67e22; padding: 15px; border-radius: 15px; margin: 10px auto; text-align: left; line-height: 1.6; color: #5d4037; width: var(--ui-width); box-sizing: border-box; font-size: 15px; }
 
         /* --- 蒐集底圖區域 --- */
         #collection-board { width: var(--ui-width); position: relative; margin: 10px auto 20px; border-radius: 15px; overflow: hidden; border: 4px solid #333; line-height: 0; background-color: #f1dbaf; }
         #collection-bg { width: 100%; height: auto; display: block; }
-        
-        /* 壽司扭蛋球基礎樣式 */
-        .reward-ball {
-            position: absolute;
-            width: 32%; /* 扭蛋球大小 */
-            pointer-events: none;
-            display: none;
-            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3));
-            z-index: 5;
-        }
-
-        /* 靜態顯示 (已經存在的壽司) */
+        .reward-ball { position: absolute; width: 32%; pointer-events: none; display: none; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3)); z-index: 5; }
         .ball-static { display: block !important; opacity: 1; }
-
-        /* 滾動動畫 (新獲得的壽司) */
-        .ball-rolling {
-            display: block !important;
-            animation: rollInNatural 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-        }
-
+        .ball-rolling { display: block !important; animation: rollInNatural 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
         @keyframes rollInNatural {
             0% { transform: translate(-300px, -100px) rotate(-720deg); opacity: 0; }
             60% { transform: translate(20px, 10px) rotate(30deg); opacity: 1; }
-            80% { transform: translate(-10px, -5px) rotate(-10deg); }
             100% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
         }
-
-        /* 自然散落的位置 (不再精確對齊背景圓圈) */
         #pos-7 { bottom: 35%; left: 10%; }
         #pos-8 { bottom: 38%; left: 45%; }
         #pos-9 { bottom: 10%; left: 25%; }
         #pos-10 { bottom: 15%; left: 58%; }
 
-        /* 單元單字預覽 */
-        .unit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: var(--ui-width); margin: 0 auto 20px; }
-        .unit-card { background: #fff; border: 2px solid var(--wood); border-radius: 12px; padding: 10px; text-align: left; }
-        .unit-card h3 { margin: 0 0 5px 0; font-size: 16px; color: var(--sushi-red); border-bottom: 1px solid #eee; }
-        .word-preview { font-size: 11px; color: #777; line-height: 1.4; margin-bottom: 10px; height: 45px; overflow: hidden; }
-
         /* 遊戲介面 */
-        #image-container { width: var(--ui-width); aspect-ratio: 16 / 10; margin: 0 auto 15px; background: #fff; border-radius: 20px; border: 4px solid var(--wood); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        #image-container { width: var(--ui-width); aspect-ratio: 16 / 10; margin: 0 auto 10px; background: #fff; border-radius: 20px; border: 4px solid var(--wood); display: flex; align-items: center; justify-content: center; overflow: hidden; }
         #image-container img { width: 100%; height: 100%; object-fit: contain; }
         #answer-input { font-size: 26px; padding: 12px; width: var(--ui-width); border-radius: 15px; border: 3px solid #DDD; text-align: center; margin: 10px auto; display: block; outline: none; }
         
@@ -66,19 +39,40 @@
         .btn-submit { background: var(--sushi-red); color: white; box-shadow: 0 4px 0 #bd2f3a; }
         .btn-start { background: #e67e22; color: white; padding: 8px; font-size: 14px; width: 100%; margin: 5px 0; }
 
-        /* 手機版盤子高度調整 */
-        #plate-stack { position: absolute; left: 15px; bottom: 150px; display: flex; flex-direction: column-reverse; z-index: 10; pointer-events: none; }
-        .plate { width: 65px; height: 16px; background: #a8dadc; border: 2px solid #457b9d; border-radius: 50%; margin-bottom: -9px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); animation: slideIn 0.4s ease-out; }
+        /* --- 橫向盤子樣式修正 --- */
+        #plate-stack { 
+            display: flex; 
+            flex-direction: row; 
+            justify-content: center; 
+            gap: 8px; 
+            margin: 15px auto; 
+            min-height: 40px; 
+            width: var(--ui-width);
+        }
+        .plate { 
+            width: 55px; 
+            height: 18px; 
+            background: #a8dadc; 
+            border: 2px solid #457b9d; 
+            border-radius: 50%; 
+            box-shadow: 0 3px 5px rgba(0,0,0,0.15); 
+            animation: platePop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; 
+        }
+        @keyframes platePop { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
-        /* 扭蛋動畫區 */
+        /* 扭蛋區 */
         #gacha-area { text-align: center; }
         #gacha-video { width: var(--ui-width); max-width: 400px; border-radius: 20px; margin-top: 30px; background: #fff; border: 4px solid var(--wood); }
         #reward-reveal { display: none; }
         #reward-reveal img { width: 220px; border-radius: 50%; margin-top: 20px; animation: pop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 
         .hidden { display: none; }
-        @keyframes slideIn { from { transform: translateX(-150px); } to { transform: translateX(0); } }
         @keyframes pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+        
+        .unit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: var(--ui-width); margin: 0 auto 20px; }
+        .unit-card { background: #fff; border: 2px solid var(--wood); border-radius: 12px; padding: 10px; text-align: left; }
+        .unit-card h3 { margin: 0 0 5px 0; font-size: 16px; color: var(--sushi-red); border-bottom: 1px solid #eee; }
+        .word-preview { font-size: 11px; color: #777; line-height: 1.4; margin-bottom: 10px; height: 45px; overflow: hidden; }
     </style>
 </head>
 <body>
@@ -96,7 +90,6 @@
 
         <div id="collection-board">
             <img id="collection-bg" src="collection_bg.png">
-            <!-- 獎勵壽司球 -->
             <img id="pos-7" class="reward-ball" src="reward_7.png">
             <img id="pos-8" class="reward-ball" src="reward_8.png">
             <img id="pos-9" class="reward-ball" src="reward_9.png">
@@ -104,21 +97,23 @@
         </div>
 
         <div class="unit-grid">
-            <div class="unit-card"><h3>Unit 7</h3><div class="word-preview" id="preview-7"></div><button class="action-btn btn-start" onclick="startGame(7)">開始挑戰</button></div>
-            <div class="unit-card"><h3>Unit 8</h3><div class="word-preview" id="preview-8"></div><button class="action-btn btn-start" onclick="startGame(8)">開始挑戰</button></div>
-            <div class="unit-card"><h3>Unit 9</h3><div class="word-preview" id="preview-9"></div><button class="action-btn btn-start" onclick="startGame(9)">開始挑戰</button></div>
-            <div class="unit-card"><h3>Unit 10</h3><div class="word-preview" id="preview-10"></div><button class="action-btn btn-start" onclick="startGame(10)">開始挑戰</button></div>
+            <div class="unit-card"><h3>Unit 7</h3><div class="word-preview" id="preview-7"></div><button class="action-btn btn-start" onclick="startGame(7)">挑戰此單元</button></div>
+            <div class="unit-card"><h3>Unit 8</h3><div class="word-preview" id="preview-8"></div><button class="action-btn btn-start" onclick="startGame(8)">挑戰此單元</button></div>
+            <div class="unit-card"><h3>Unit 9</h3><div class="word-preview" id="preview-9"></div><button class="action-btn btn-start" onclick="startGame(9)">挑戰此單元</button></div>
+            <div class="unit-card"><h3>Unit 10</h3><div class="word-preview" id="preview-10"></div><button class="action-btn btn-start" onclick="startGame(10)">挑戰此單元</button></div>
         </div>
     </div>
 
     <!-- 2. 遊戲區域 -->
     <div id="game-area" class="hidden">
-        <div id="plate-stack"></div>
         <div id="image-container"></div>
         <button class="action-btn btn-speak" onclick="speakWord()">🔊 聽聽發音</button>
         <input type="text" id="answer-input" autocomplete="off" placeholder="在此輸入拼法..." onkeypress="handleKeyPress(event)">
         <button class="action-btn btn-submit" onclick="checkAnswer()">放入回收口 ➔</button>
         <div id="result-msg" style="height: 30px; margin-top: 10px; font-weight: bold; font-size: 18px;"></div>
+        
+        <!-- 盤子橫向顯示在訊息下方 -->
+        <div id="plate-stack"></div>
     </div>
 
     <!-- 3. 扭蛋動畫區域 -->
@@ -128,7 +123,6 @@
             <video id="gacha-video" muted playsinline>
                 <source src="gacha_shake.mp4" type="video/mp4">
             </video>
-            <p style="color: #888;">正在扭蛋中...</p>
         </div>
         <div id="reward-reveal">
             <h3>🎉 獲得新壽司球了！</h3>
@@ -148,11 +142,8 @@
     };
 
     const sushiNames = { 7: "鮮蝦扭蛋球", 8: "鮭魚卵扭蛋球", 9: "鮪魚扭蛋球", 10: "太卷扭蛋球" };
-    
-    // 遊戲狀態追蹤
     let collectedUnits = { 7: false, 8: false, 9: false, 10: false };
-    let lastCollectedUnit = null; // 紀錄剛剛這一局拿到的單元
-
+    let lastCollectedUnit = null;
     let currentUnitID = 0, currentPool = [], plateCount = 0, currentQuestion = null;
 
     function initPreviews() {
@@ -192,10 +183,13 @@
 
         if (userAns === correctAns) {
             plateCount++;
+            // 橫向新增盤子
             const p = document.createElement('div'); p.className = 'plate';
             document.getElementById('plate-stack').appendChild(p);
-            if (plateCount >= 5) setTimeout(triggerGacha, 800);
-            else {
+            
+            if (plateCount >= 5) {
+                setTimeout(triggerGacha, 800);
+            } else {
                 document.getElementById('result-msg').innerHTML = "<span style='color:green'>✨ 對了！盤子+1</span>";
                 setTimeout(nextQuestion, 1200);
             }
@@ -207,17 +201,10 @@
     function triggerGacha() {
         document.getElementById('game-area').classList.add('hidden');
         document.getElementById('gacha-area').classList.remove('hidden');
-        document.getElementById('gacha-video-container').style.display = 'block';
-        document.getElementById('reward-reveal').style.display = 'none';
-
         const video = document.getElementById('gacha-video');
         video.currentTime = 0; 
         video.onended = function() { showReward(); };
-
-        const playPromise = video.play();
-        if (playPromise !== undefined) {
-            playPromise.catch(error => { setTimeout(showReward, 3000); });
-        }
+        video.play().catch(() => { setTimeout(showReward, 3000); });
     }
 
     function showReward() {
@@ -225,47 +212,33 @@
         document.getElementById('reward-reveal').style.display = 'block';
         document.getElementById('reward-img').src = `reward_${currentUnitID}.png`;
         document.getElementById('reward-name').innerText = sushiNames[currentUnitID];
-        
-        // 紀錄這一局成功的單元
         lastCollectedUnit = currentUnitID;
     }
 
-    // 回到選單並觸發動畫
     function goToMenuWithAnimation() {
-        // 先把成功的單元設為 true
         if (lastCollectedUnit) collectedUnits[lastCollectedUnit] = true;
-        
         document.getElementById('gacha-area').classList.add('hidden');
         document.getElementById('main-menu').classList.remove('hidden');
-
-        // 重新渲染底圖上的壽司
         renderCollection();
     }
 
     function renderCollection() {
         for (let id in collectedUnits) {
             const ballElement = document.getElementById(`pos-${id}`);
-            
-            // 如果蒐集到了
             if (collectedUnits[id]) {
-                // 如果是剛剛拿到的，給予滾動動畫
                 if (parseInt(id) === lastCollectedUnit) {
                     ballElement.classList.remove('ball-static');
                     ballElement.classList.add('ball-rolling');
                 } else {
-                    // 如果是以前拿到的，直接顯示靜態
                     ballElement.classList.add('ball-static');
                     ballElement.classList.remove('ball-rolling');
                 }
             } else {
-                // 如果沒蒐集到，維持隱藏
                 ballElement.classList.remove('ball-static', 'ball-rolling');
             }
         }
-        // 動畫播完後，把「最後拿到」的標記清除，避免下次進選單又播一次
         setTimeout(() => { lastCollectedUnit = null; }, 1500);
     }
 </script>
 </body>
 </html>
-
