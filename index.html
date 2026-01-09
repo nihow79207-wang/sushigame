@@ -2,26 +2,28 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>英文拼字壽司蒐集大賽</title>
     <style>
-        :root { --sushi-red: #e63946; --ui-width: 92%; --wood: #f1dbaf; }
-        body { font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; background-color: #fdf0d5; text-align: center; margin: 0; padding: 10px; }
-        .container { max-width: 550px; margin: 10px auto; background: white; padding: 25px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 8px solid #333; position: relative; min-height: 800px; box-sizing: border-box; }
+        :root { --sushi-red: #e63946; --ui-width: 94%; --wood: #f1dbaf; }
+        body { font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; background-color: #fdf0d5; text-align: center; margin: 0; padding: 5px; }
         
-        .shop-header { background: var(--sushi-red); color: white; padding: 15px; border-radius: 15px 15px 0 0; margin: -25px -25px 25px -25px; font-weight: bold; font-size: 24px; border-bottom: 5px solid #bd2f3a; }
+        /* 容器縮減 padding 讓畫面更緊湊 */
+        .container { max-width: 500px; margin: 5px auto; background: white; padding: 15px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 6px solid #333; position: relative; min-height: 90vh; box-sizing: border-box; }
+        
+        /* 標題縮小一點 */
+        .shop-header { background: var(--sushi-red); color: white; padding: 10px; border-radius: 15px 15px 0 0; margin: -15px -15px 15px -15px; font-weight: bold; font-size: 20px; border-bottom: 4px solid #bd2f3a; }
 
-        .intro-box { background: #fffcf0; border: 2px dashed #e67e22; padding: 15px; border-radius: 15px; margin: 10px auto; text-align: left; line-height: 1.6; color: #5d4037; width: var(--ui-width); box-sizing: border-box; font-size: 15px; }
+        .intro-box { background: #fffcf0; border: 2px dashed #e67e22; padding: 10px; border-radius: 15px; margin: 0 auto 15px; text-align: left; line-height: 1.5; color: #5d4037; width: var(--ui-width); box-sizing: border-box; font-size: 14px; }
 
-        /* --- 蒐集底圖區域 --- */
-        #collection-board { width: var(--ui-width); position: relative; margin: 10px auto 20px; border-radius: 15px; overflow: hidden; border: 4px solid #333; line-height: 0; background-color: #f1dbaf; }
+        /* 蒐集底圖 */
+        #collection-board { width: var(--ui-width); position: relative; margin: 0 auto 15px; border-radius: 12px; overflow: hidden; border: 3px solid #333; line-height: 0; }
         #collection-bg { width: 100%; height: auto; display: block; }
-        .reward-ball { position: absolute; width: 32%; pointer-events: none; display: none; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3)); z-index: 5; }
+        .reward-ball { position: absolute; width: 32%; pointer-events: none; display: none; filter: drop-shadow(2px 3px 5px rgba(0,0,0,0.3)); z-index: 5; }
         .ball-static { display: block !important; opacity: 1; }
-        .ball-rolling { display: block !important; animation: rollInNatural 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
+        .ball-rolling { display: block !important; animation: rollInNatural 1.2s forwards; }
         @keyframes rollInNatural {
-            0% { transform: translate(-300px, -100px) rotate(-720deg); opacity: 0; }
-            60% { transform: translate(20px, 10px) rotate(30deg); opacity: 1; }
+            0% { transform: translate(-200px, -50px) rotate(-540deg); opacity: 0; }
             100% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
         }
         #pos-7 { bottom: 35%; left: 10%; }
@@ -29,50 +31,65 @@
         #pos-9 { bottom: 10%; left: 25%; }
         #pos-10 { bottom: 15%; left: 58%; }
 
-        /* 遊戲介面 */
-        #image-container { width: var(--ui-width); aspect-ratio: 16 / 10; margin: 0 auto 10px; background: #fff; border-radius: 20px; border: 4px solid var(--wood); display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        #image-container img { width: 100%; height: 100%; object-fit: contain; }
-        #answer-input { font-size: 26px; padding: 12px; width: var(--ui-width); border-radius: 15px; border: 3px solid #DDD; text-align: center; margin: 10px auto; display: block; outline: none; }
-        
-        .action-btn { width: var(--ui-width); padding: 15px; font-size: 18px; cursor: pointer; border-radius: 15px; border: none; font-weight: bold; margin: 8px auto; display: block; }
-        .btn-speak { background: #3498db; color: white; }
-        .btn-submit { background: var(--sushi-red); color: white; box-shadow: 0 4px 0 #bd2f3a; }
-        .btn-start { background: #e67e22; color: white; padding: 8px; font-size: 14px; width: 100%; margin: 5px 0; }
+        /* 遊戲區域優化：縮小高度以防鍵盤遮擋 */
+        #image-container { 
+            width: 85%; 
+            max-height: 180px; /* 限制最大高度 */
+            aspect-ratio: 16 / 11; 
+            margin: 0 auto 10px; 
+            background: #fff; 
+            border-radius: 15px; 
+            border: 3px solid var(--wood); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            overflow: hidden; 
+        }
+        #image-container img { height: 100%; width: auto; object-fit: contain; }
 
-        /* --- 橫向盤子樣式修正 --- */
+        #answer-input { font-size: 24px; padding: 10px; width: var(--ui-width); border-radius: 12px; border: 3px solid #DDD; text-align: center; margin: 5px auto; display: block; outline: none; box-sizing: border-box; }
+        
+        .action-btn { width: var(--ui-width); padding: 12px; font-size: 18px; cursor: pointer; border-radius: 15px; border: none; font-weight: bold; margin: 5px auto; display: block; }
+        .btn-speak { background: #3498db; color: white; padding: 10px; font-size: 16px; }
+        .btn-submit { background: var(--sushi-red); color: white; font-size: 20px; box-shadow: 0 4px 0 #bd2f3a; }
+
+        /* 盤子區塊：緊跟在文字下方 */
         #plate-stack { 
             display: flex; 
             flex-direction: row; 
             justify-content: center; 
-            gap: 8px; 
-            margin: 15px auto; 
-            min-height: 40px; 
-            width: var(--ui-width);
+            gap: 6px; 
+            margin: 10px auto; 
+            min-height: 30px; 
+            width: 100%;
         }
         .plate { 
-            width: 55px; 
-            height: 18px; 
+            width: 50px; 
+            height: 15px; 
             background: #a8dadc; 
             border: 2px solid #457b9d; 
             border-radius: 50%; 
-            box-shadow: 0 3px 5px rgba(0,0,0,0.15); 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15); 
             animation: platePop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; 
         }
         @keyframes platePop { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
+        #result-msg { height: 25px; margin-top: 5px; font-weight: bold; font-size: 18px; }
+
         /* 扭蛋區 */
-        #gacha-area { text-align: center; }
-        #gacha-video { width: var(--ui-width); max-width: 400px; border-radius: 20px; margin-top: 30px; background: #fff; border: 4px solid var(--wood); }
+        #gacha-area { text-align: center; padding-top: 20px; }
+        #gacha-video { width: 90%; max-width: 350px; border-radius: 20px; border: 4px solid var(--wood); }
         #reward-reveal { display: none; }
-        #reward-reveal img { width: 220px; border-radius: 50%; margin-top: 20px; animation: pop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        #reward-reveal img { width: 200px; border-radius: 50%; margin-top: 20px; animation: pop 0.8s forwards; }
 
         .hidden { display: none; }
         @keyframes pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
         
-        .unit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: var(--ui-width); margin: 0 auto 20px; }
-        .unit-card { background: #fff; border: 2px solid var(--wood); border-radius: 12px; padding: 10px; text-align: left; }
-        .unit-card h3 { margin: 0 0 5px 0; font-size: 16px; color: var(--sushi-red); border-bottom: 1px solid #eee; }
-        .word-preview { font-size: 11px; color: #777; line-height: 1.4; margin-bottom: 10px; height: 45px; overflow: hidden; }
+        .unit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: var(--ui-width); margin: 0 auto; }
+        .unit-card { background: #fff; border: 2px solid var(--wood); border-radius: 12px; padding: 8px; text-align: left; }
+        .unit-card h3 { margin: 0 0 5px 0; font-size: 15px; color: var(--sushi-red); }
+        .word-preview { font-size: 10px; color: #777; line-height: 1.3; height: 36px; overflow: hidden; }
+        .btn-start { background: #e67e22; color: white; padding: 6px; font-size: 13px; width: 100%; margin: 2px 0; border-radius: 8px; }
     </style>
 </head>
 <body>
@@ -97,10 +114,10 @@
         </div>
 
         <div class="unit-grid">
-            <div class="unit-card"><h3>Unit 7</h3><div class="word-preview" id="preview-7"></div><button class="action-btn btn-start" onclick="startGame(7)">挑戰此單元</button></div>
-            <div class="unit-card"><h3>Unit 8</h3><div class="word-preview" id="preview-8"></div><button class="action-btn btn-start" onclick="startGame(8)">挑戰此單元</button></div>
-            <div class="unit-card"><h3>Unit 9</h3><div class="word-preview" id="preview-9"></div><button class="action-btn btn-start" onclick="startGame(9)">挑戰此單元</button></div>
-            <div class="unit-card"><h3>Unit 10</h3><div class="word-preview" id="preview-10"></div><button class="action-btn btn-start" onclick="startGame(10)">挑戰此單元</button></div>
+            <div class="unit-card"><h3>Unit 7</h3><div class="word-preview" id="preview-7"></div><button class="btn-start" onclick="startGame(7)">開始挑戰</button></div>
+            <div class="unit-card"><h3>Unit 8</h3><div class="word-preview" id="preview-8"></div><button class="btn-start" onclick="startGame(8)">開始挑戰</button></div>
+            <div class="unit-card"><h3>Unit 9</h3><div class="word-preview" id="preview-9"></div><button class="btn-start" onclick="startGame(9)">開始挑戰</button></div>
+            <div class="unit-card"><h3>Unit 10</h3><div class="word-preview" id="preview-10"></div><button class="btn-start" onclick="startGame(10)">開始挑戰</button></div>
         </div>
     </div>
 
@@ -108,11 +125,13 @@
     <div id="game-area" class="hidden">
         <div id="image-container"></div>
         <button class="action-btn btn-speak" onclick="speakWord()">🔊 聽聽發音</button>
-        <input type="text" id="answer-input" autocomplete="off" placeholder="在此輸入拼法..." onkeypress="handleKeyPress(event)">
-        <button class="action-btn btn-submit" onclick="checkAnswer()">放入回收口 ➔</button>
-        <div id="result-msg" style="height: 30px; margin-top: 10px; font-weight: bold; font-size: 18px;"></div>
+        <!-- 入力時にスクロール調整 -->
+        <input type="text" id="answer-input" autocomplete="off" placeholder="在此輸入拼法..." onkeypress="handleKeyPress(event)" onfocus="this.scrollIntoView({behavior:'smooth'})">
+        <button class="action-btn btn-submit" id="submit-btn" onclick="checkAnswer()">提交答案 ➔</button>
         
-        <!-- 盤子橫向顯示在訊息下方 -->
+        <div id="result-msg"></div>
+        
+        <!-- 盤子直接在訊息下方 -->
         <div id="plate-stack"></div>
     </div>
 
@@ -156,6 +175,7 @@
     function startGame(unit) {
         currentUnitID = unit; currentPool = [...data[unit]]; plateCount = 0;
         document.getElementById('plate-stack').innerHTML = "";
+        document.getElementById('result-msg').innerHTML = "";
         document.getElementById('main-menu').classList.add('hidden');
         document.getElementById('game-area').classList.remove('hidden');
         nextQuestion();
@@ -165,8 +185,10 @@
         if (currentPool.length === 0) currentPool = [...data[currentUnitID]];
         const idx = Math.floor(Math.random() * currentPool.length);
         currentQuestion = currentPool.splice(idx, 1)[0];
-        document.getElementById('image-container').innerHTML = `<img src="${currentQuestion.i}" onerror="this.src='https://dummyimage.com/300x200/eee/666&text=Sushi';">`;
-        document.getElementById('answer-input').value = ""; document.getElementById('answer-input').focus();
+        document.getElementById('image-container').innerHTML = `<img src="${currentQuestion.i}" onerror="this.src='https://dummyimage.com/250x180/eee/666&text=Sushi';">`;
+        document.getElementById('answer-input').value = "";
+        document.getElementById('result-msg').innerHTML = "";
+        // 不要自動 focus，防止鍵盤閃現遮擋
     }
 
     function speakWord() {
@@ -175,7 +197,7 @@
         window.speechSynthesis.speak(msg);
     }
 
-    function handleKeyPress(e) { if (e.key === 'Enter') checkAnswer(); }
+    function handleKeyPress(e) { if (e.key === 'Enter') { document.activeElement.blur(); checkAnswer(); } }
 
     function checkAnswer() {
         const userAns = document.getElementById('answer-input').value.trim().toLowerCase();
@@ -183,7 +205,6 @@
 
         if (userAns === correctAns) {
             plateCount++;
-            // 橫向新增盤子
             const p = document.createElement('div'); p.className = 'plate';
             document.getElementById('plate-stack').appendChild(p);
             
